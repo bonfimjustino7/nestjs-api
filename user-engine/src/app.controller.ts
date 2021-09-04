@@ -1,12 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import { UserEntity } from './intefaces/user.entity';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  private readonly logger = new Logger(AppController.name); // logger
+
+  @MessagePattern('find-all-user')
+  async index(): Promise<UserEntity[]> {
+    return this.appService.findAll();
+  }
+
+  @MessagePattern('create-user')
+  async create(@Payload() data: any): Promise<UserEntity> {
+    this.logger.log(`User: ${JSON.stringify(data)}`);
+
+    return await this.appService.create(data.value);
   }
 }
