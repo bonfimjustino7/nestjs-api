@@ -1,3 +1,4 @@
+import { UserDto } from './dto/UserDto';
 import { UserEntity } from './database/user.entity';
 import { UsersService } from './users.service';
 import { User } from './interfaces/users.interfaces';
@@ -27,14 +28,14 @@ export class UsersController {
 
   @Put(':id')
   async update(
-    @Body() user: User,
+    @Body() user: UserDto,
     @Param('id') id: string,
   ): Promise<UserEntity> {
     return await this.userService.update(id, user);
   }
 
   @Post()
-  async create(@Body() user: User): Promise<UserEntity> {
+  async create(@Body() user: UserDto): Promise<UserEntity> {
     return await this.userService.create(user);
   }
 
