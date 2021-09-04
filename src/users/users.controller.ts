@@ -1,46 +1,41 @@
+import { Client, ClientKafka, Transport } from '@nestjs/microservices';
 import { UserDto } from './dto/UserDto';
 import { UserEntity } from './database/user.entity';
-import { UsersService } from './users.service';
-import { User } from './interfaces/users.interfaces';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, OnModuleInit, Post } from '@nestjs/common';
+import { Observable } from 'rxjs';
 
 @Controller('users')
-export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+export class UsersController implements OnModuleInit {
+  @Client({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        clientId: 'user',
+        brokers: ['localhost:9092'],
+      },
+      consumer: {
+        groupId: 'user-consumer',
+        allowAutoTopicCreation: true,
+      },
+    },
+  })
+  private client: ClientKafka;
+
+  async onModuleInit() {
+    const requestPatters = ['find-all-user', 'create-user'];
+
+    requestPatters.forEach(async (pattern) => {
+      this.client.subscribeToResponseOf(pattern);
+      await this.client.connect();
+    });
+  }
 
   @Get()
-  async list(): Promise<UserEntity[]> {
-    return this.userService.findAll();
+  index(): Observable<UserEntity[]> {
+    return this.client.send('find-all-user', {});
   }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserEntity> {
-    return this.userService.findOne(id);
-  }
-
-  @Put(':id')
-  async update(
-    @Body() user: UserDto,
-    @Param('id') id: string,
-  ): Promise<UserEntity> {
-    return await this.userService.update(id, user);
-  }
-
   @Post()
-  async create(@Body() user: UserDto): Promise<UserEntity> {
-    return await this.userService.create(user);
-  }
-
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    await this.userService.delete(id);
+  create(@Body() user: UserDto): Observable<UserEntity> {
+    return this.client.send('create-user', user);
   }
 }
