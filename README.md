@@ -25,6 +25,9 @@
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API para cadastro de usuários
+
+- Use kafka as message broker
 
 ## Installation
 
