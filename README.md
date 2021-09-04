@@ -23,8 +23,8 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API criada para estudo do framework nestjs com microserviços
+ - [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 ### Message Broker
 - Kafka
 
